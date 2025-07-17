@@ -1,20 +1,18 @@
-Stream<int> safeDivide(int a, int b) => b == 0
-    ? Stream.error(
-       ArgumentError.value(b, 'b', 'must be non‑zero'),
-      )
-    : Stream.value(a ~/ b);
-
-void foo(int a, int b) {
-  safeDivide(a, b)
-      .handleError( // перехват и обработка исключений
-        (e) => print(e),
-        // перехватить только ArgumentError
-        test: (e) => e is ArgumentError,
-      ) // поглотили
-      .listen(print, onDone: () => print('done'));
+Iterable<int> myGenerator(int n) sync* {
+  var k = 0;
+  while(k < n){
+    if (k % 4 == 0){
+      yield k;
+    }
+    k++;
+  }
 }
 
-void main() {
-  foo(5, 0);
-  foo(5, 1);
+void main(List<String> arguments) {
+  var result = <int>[];
+  var it = myGenerator(20);
+  it.forEach((element) {result.add(element);});
+  var result1 = it.toList();
+  print(result); // [0, 4, 8, 12, 16]
+  print(result1); // [0, 4, 8, 12, 16]
 }

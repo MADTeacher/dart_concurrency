@@ -1,24 +1,16 @@
+import 'dart:async';
 import 'dart:io';
 
-Iterable<int> myGenerator(int n) sync* {
-  var k = 0;
-  while(k < n){
-    if (k % 4 == 0){
-      yield k;
-    }
-    k++;
-  }
-}
+void main() async {
+  final sub = Stream.periodic(const Duration(milliseconds: 300), (i) => i)
+      .take(10)                         // ограничим 10-ю событиями
+      .listen((v) => stdout.write('$v '));
 
-void main(List<String> arguments) {
-  var result = <int>[];
-  
-  print('Введите границу генерируемой послед-ти: '); 
-  // читаем значение введенное с клавиатуры
-  var n = int.parse(stdin.readLineSync()!); // вводим 20
-
-  for(var it in myGenerator(n)){
-    result.add(it);
-  }
-  print(result); // [0, 4, 8, 12, 16]
+  await Future.delayed(const Duration(seconds: 1));
+  print('\n⏸ пауза');
+  sub.pause(); // останавливаем прослушивание
+  await Future.delayed(const Duration(seconds: 1));
+  print('▶ продолжили');
+  sub.resume();   // возобновляем прослушивание
+  await sub.asFuture();  // дожидаемся завершения потока
 }

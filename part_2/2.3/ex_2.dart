@@ -1,34 +1,15 @@
-import 'dart:async';
+Iterable<int> myGenerator() sync* {
+  yield 0;
+  yield 1;
+  yield 2;
+  yield 3;
+  yield 4;
+}
 
-Stream<int> fetchNumbers() async* {
-  for (int i = 1; i <= 3; i++) {
-    yield i;
-    await Future.delayed(const Duration(milliseconds: 500));
+void main(List<String> arguments) {
+  var result = <int>[];
+  for(var it in myGenerator()){
+    result.add(it);
   }
-}
-
-// c Stream.empty
-Stream<int> loadData({required bool available}) {
-  return available ? fetchNumbers() : const Stream.empty();
-}
-
-// c null (у потока не вызовется onDone)
-// Stream<int>? loadData({required bool available}) {
-//   return available ? fetchNumbers() : null;
-// }
-
-void foo(bool available){
-  final stream = loadData(available: available);
-  stream.listen((data) {
-    print(data);
-  }, onError: (error) {
-    print('Error: $error');
-  }, onDone: () {
-    print('Stream completed');
-  });
-}
-
-void main() async {
-  foo(false);
-  foo(true);  
+  print(result); // [0, 1, 2, 3, 4]
 }

@@ -1,18 +1,19 @@
-Iterable<int> myGenerator(int n) sync* {
-  var k = 0;
-  while(k < n){
-    if (k % 4 == 0){
-      yield k;
-    }
-    k++;
-  }
+import 'dart:async';
+import 'dart:io';
+
+void main() async {
+  final sub = Stream.periodic(const Duration(milliseconds: 300), (i) => i)
+      .take(10) // ограничим 10-ю событиями
+      .listen((v) => stdout.write('$v '));
+
+  await Future.delayed(const Duration(seconds: 1));
+  // Ставим на паузу, но сразу передаем Future.delayed
+  // с задержкой на 1 сек. Поток возобновится автоматом,
+  // поэтому ручной вызов resume() больше не нужен.
+  print('\n⏸ пауза на 1 c');
+  sub.pause(Future.delayed(const Duration(seconds: 1)));
+
+  sub.resume();   // возобновляем прослушивание
+  await sub.asFuture();  // дожидаемся завершения потока
 }
 
-void main(List<String> arguments) {
-  var result = <int>[];
-  var it = myGenerator(20);
-  it.forEach((element) {result.add(element);});
-  var result1 = it.toList();
-  print(result); // [0, 4, 8, 12, 16]
-  print(result1); // [0, 4, 8, 12, 16]
-}
