@@ -6,6 +6,10 @@ void workerFunction(SendPort sendPort) {
   Timer.periodic(const Duration(seconds: 1), (timer) {
     counter++;
     sendPort.send('[${Isolate.current.debugName}]: $counter');
+    if (counter == 5) {
+      timer.cancel();
+      Isolate.exit(sendPort, 'exit');
+    }
   });
 }
 

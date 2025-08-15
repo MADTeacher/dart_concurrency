@@ -6,6 +6,10 @@ void workerFunction(SendPort sendPort) {
   Timer.periodic(const Duration(seconds: 1), (timer) {
     counter++;
     sendPort.send('[${Isolate.current.debugName}]: $counter');
+    if (counter == 5) {
+      timer.cancel();
+      Isolate.exit(sendPort, 'exit');
+    }
   });
 }
 
@@ -31,8 +35,14 @@ void main() async {
   });
 
   // Подписываемся на прослушивание сообщений от исходного изолята
+  var count = 0;
   final portSub = port.listen((message) {
     print('[Main isolate]: $message');
+    count++;
+    if (count >= 3) {
+      print('Isolate will be killed');
+      isolate.kill(priority: Isolate.immediate);
+    }
   });
 
   await completer.future;
