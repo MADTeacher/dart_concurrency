@@ -1,13 +1,13 @@
 import 'dart:isolate';
 
-/// Перечисление типов сообщений для обмена между изолятами.
+/// Перечисление типов сообщений для обмена между изолятами
 enum MessageType {
-  start, // Сообщение для инициализации связи.
-  stop, // Сообщение для завершения работы.
-  request, // Сообщение с запросом на выполнение операции.
-  response; // Сообщение с результатом операции.
+  start, // Сообщение для инициализации связи
+  stop, // Сообщение для завершения работы
+  request, // Сообщение с запросом на выполнение операции
+  response; // Сообщение с результатом операции
 
-  /// Фабричный метод для создания экземпляра MessageType из строки.
+  /// Фабричный метод для создания экземпляра MessageType из строки
   static MessageType fromString(String value) {
     return switch (value) {
       'start' => MessageType.start,
@@ -19,14 +19,15 @@ enum MessageType {
   }
 }
 
-/// Запечатанный (sealed) базовый класс для всех сообщений.
-/// Определяет общую структуру и фабрику для десериализации JSON.
+// Запечатанный (sealed) базовый класс для всех сообщений
+// Определяет общую структуру и фабрику для десериализации JSON
 sealed class Message {
   final MessageType type;
   Message({required this.type});
 
-  /// Фабрика для создания конкретного экземпляра сообщения из JSON.
-  /// Использует поле 'type' для определения, какой класс сообщения создать.
+  // Фабрика для создания конкретного экземпляра сообщения из JSON,
+  // использующая поле 'type' для определения,
+  // какой класс сообщения создать
   factory Message.fromJson(Map<String, dynamic> json) {
     if (json case {'type': var type}) {
       var msType = MessageType.fromString(type);
@@ -45,22 +46,21 @@ sealed class Message {
     throw Exception('Unknown message: $json');
   }
 
-  /// Абстрактный метод для преобразования сообщения в JSON.
+  // Абстрактный метод для преобразования сообщения в JSON
   Map<String, dynamic> toJson();
 }
 
-/// Сообщение, отправляемое дочерним изолятом для инициализации.
-/// Содержит [SendPort] для обратной связи и приветственное сообщение.
+// Сообщение, отправляемое дочерним изолятом при инициализации
 class StartMessage extends Message {
-  final SendPort sender; // Порт для отправки сообщений в этот изолят.
-  final String hello; // Приветственное сообщение.
+  final SendPort sender;
+  final String hello;
   StartMessage(
     this.sender,
     this.hello, {
     super.type = MessageType.start,
   });
 
-  /// Фабрика для создания StartMessage из JSON.
+  // Фабричный конструктор для создания StartMessage из JSON
   factory StartMessage.fromJson(Map<String, dynamic> json) {
     return StartMessage(json['sender'], json['hello']);
   }
@@ -71,11 +71,11 @@ class StartMessage extends Message {
   }
 }
 
-/// Сообщение для остановки работы изолята.
+// Сообщение для остановки работы плагина
 class StopMessage extends Message {
   StopMessage({super.type = MessageType.stop});
 
-  /// Фабрика для создания StopMessage из JSON.
+  // Фабричный конструктор для создания StopMessage из JSON
   factory StopMessage.fromJson(Map<String, dynamic> json) {
     return StopMessage();
   }
@@ -88,11 +88,11 @@ class StopMessage extends Message {
   }
 }
 
-/// Сообщение-запрос от главного изолята к дочернему.
-/// Содержит данные для вычислений.
+// Сообщение-запрос от основного приложения к плагину,
+// содержащее данные для вычислений
 class RequestMessage extends Message {
-  final int firstValue; // Первое число для операции.
-  final int secondValue; // Второе число для операции.
+  final int firstValue;
+  final int secondValue;
 
   RequestMessage(
     this.firstValue,
@@ -100,7 +100,7 @@ class RequestMessage extends Message {
     super.type = MessageType.request,
   });
 
-  /// Фабрика для создания RequestMessage из JSON.
+  // Фабричный конструктор для создания RequestMessage из JSON
   factory RequestMessage.fromJson(Map<String, dynamic> json) {
     return RequestMessage(
       json['firstValue'],
@@ -118,16 +118,16 @@ class RequestMessage extends Message {
   }
 }
 
-/// Сообщение-ответ от дочернего изолята к главному.
-/// Содержит результат вычислений.
+// Сообщение-ответ от плагина основному приложению,
+// содержащее результат вычислений
 class ResponseMessage extends Message {
-  final int result; // Результат вычисления.
+  final int result;
   ResponseMessage(
     this.result, {
     super.type = MessageType.response,
   });
 
-  /// Фабрика для создания ResponseMessage из JSON.
+  // Фабричный конструктор для создания ResponseMessage из JSON
   factory ResponseMessage.fromJson(Map<String, dynamic> json) {
     if (json case {'type': 'response', 'result': int data}) {
       return ResponseMessage(data);
