@@ -1,4 +1,4 @@
-# Chess_MAS_Dart
+# Chess_MAS
 
 Queen gambit is an app that solves "Zero pieces intersection" chess problem. It finds a position in which pieces have no intersections with each other by moving them
 
